@@ -3,13 +3,13 @@
  *
  * Copyright Adam Scheller, 2013
  * http://adamscheller.com/
- * 
+ *
  * Released under LGPL License
  * http://www.gnu.org/licenses/lgpl.html
  *
  * Based on original TinyMCE wordcount plugin,
  * copyright by Moxiecode Systems AB
- * 
+ *
  */
 
 /*global tinymce:true */
@@ -64,8 +64,14 @@ tinymce.PluginManager.add('charwordcount', function(editor) {
 
     self.getCountCharacters = function() {
         if (editor.settings.charwordcount_include_tags == true) {
-            // Return count of ALL characters
-            return editor.getContent({format: 'raw'}).length;
+            // Return count of ALL characters -- http://stackoverflow.com/questions/10030921/chrome-counts-characters-wrong-in-textarea-with-maxlength-attribute
+            rawContent = editor.getContent(); // format: raw does not return *all* characters that might be sent to a server!
+            var newLines = rawContent.match(/(\r\n|\n|\r)/g);   // JS can treat CR LF's weird!
+            var addition = 0;
+            if (newLines != null) {
+                addition = newLines.length;
+            }
+            return rawContent.length + addition;
         }
         else {
             // First replace: remove HTML tags, ie. <div>, </span>
